@@ -1,0 +1,29 @@
+Now using node v8.11.2 (npm v6.1.0)
+example: --dev-path /home/devchains/chain1 --mist --geth --frontend /home/frontend --frontend-port 8084 --auto-mine
+
+  Usage: remixd -s <shared folder>
+
+  Provide a two ways connection between the local computer and Remix IDE
+
+  Options:
+
+    -s, --shared-folder <path>            Folder to share with Remix IDE
+    -m, --mist                            start mist
+    -g, --geth                            start geth
+    -p, --dev-path <dev-path>             Folder used by mist/geth to start the development instance
+    -f, --frontend <front-end>            Folder that should be served by remixd
+    -p, --frontend-port <front-end-port>  Http port used by the frontend (default 8082)
+    -a, --auto-mine                       mine pending transactions
+    -r, --rpc <cors-domains>              start rpc server. Values are CORS domain
+    -rp, --rpc-port                       rpc server port (default 8545)
+    -h, --help                            output usage information
+[33m[WARN] Any application that runs on your computer can potentially read from and write to all files in the directory.[0m
+[33m[WARN] Symbolinc links are not forwarded to Remix IDE
+[0m
+setup notifications for /home/alberto/Blockchain/crowdsale
+Shared folder : /home/alberto/Blockchain/crowdsale
+Thu Jun 14 2018 11:30:49 GMT+0100 (WEST) Remixd is listening on 127.0.0.1:65520
+origin http://remix.ethereum.org
+Thu Jun 14 2018 11:34:19 GMT+0100 (WEST) Connection accepted.
+setup notifications for /home/alberto/Blockchain/crowdsale
+setup notifications for /home/alberto/Blockchain/crowdsale/.git
