@@ -22,8 +22,7 @@ example: --dev-path /home/devchains/chain1 --mist --geth --frontend /home/fronte
 [0m
 setup notifications for /home/alberto/Blockchain/crowdsale
 Shared folder : /home/alberto/Blockchain/crowdsale
-Thu Jun 14 2018 11:30:49 GMT+0100 (WEST) Remixd is listening on 127.0.0.1:65520
+Mon Jun 18 2018 20:25:36 GMT+0100 (WEST) Remixd is listening on 127.0.0.1:65520
 origin http://remix.ethereum.org
-Thu Jun 14 2018 11:34:19 GMT+0100 (WEST) Connection accepted.
+Mon Jun 18 2018 20:32:11 GMT+0100 (WEST) Connection accepted.
 setup notifications for /home/alberto/Blockchain/crowdsale
-setup notifications for /home/alberto/Blockchain/crowdsale/.git
