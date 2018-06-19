@@ -44,8 +44,9 @@ contract Crowdsale {
     
     /**
      * @dev Constructor function, which sets up the crowdsale variables. The 
-     * user creating the crowdsale must deposit in the contract the tokens to 
-     * sell to investors. 
+     * user creating the crowdsale must provide the address to a token contract
+     * with functions to keep track of how many tokens the crowdsale contract
+     * and all the investors have.
      * @param _beneficiary Address to receive the funds raised if the crowdsale
      * is successful.
      * @param _fundingGoal Ether amount to reach in the crowdsale.
@@ -76,7 +77,7 @@ contract Crowdsale {
      */
     function () payable external {
         require(!crowdsaleClosed);
-        balanceOf[msg.sender] = msg.value;
+        balanceOf[msg.sender] += msg.value;
         fundsRaised += msg.value;
         // The transfer function doesn't seem to be imported through the 
         // interface with the right number of arguments.

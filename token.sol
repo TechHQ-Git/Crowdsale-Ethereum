@@ -3,11 +3,11 @@ pragma solidity ^0.4.0;
 
 contract Token {
     /* Public variables of the token.*/
-    bool initialized = false;
     address owner = msg.sender;
     string public name;
     string public symbol;
     uint8 public decimals;
+    bool initialized;
     
     /* This creates an array with all balances.*/
     mapping(address => uint256) balances;
@@ -39,7 +39,7 @@ contract Token {
                 string _symbol,
                 uint8 _decimals
             ) public {
-        assert(initialized == false);  // Check whether you could declare the variable here first
+        assert(initialized != true);
         require(owner == msg.sender);
         balances[msg.sender] = _initialSupply;
         name = _name;
