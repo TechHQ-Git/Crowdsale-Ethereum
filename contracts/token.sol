@@ -26,6 +26,14 @@ contract Token {
         );
     
     /**
+     * @dev Builds contract and sets owner.
+     */
+    constructor() public {
+        assert(initialized != true);
+        owner = msg.sender;
+    }
+
+    /**
      * @dev Initializes contract with initial supply tokens to the creator of 
      * the token.
      * @param _initialSupply - Tokens created with the contract
@@ -33,13 +41,13 @@ contract Token {
      * @param _symbol - Token symbol (e.g. BTC)
      * @param _decimals - Minimum token fraction (e.g. 0.001)
      */
-    constructor (
+    function initialize(
                 uint256 _initialSupply,
                 string _name,
                 string _symbol,
                 uint8 _decimals
             ) public {
-        assert(initialized != true);
+        require(initialized != true);
         require(owner == msg.sender);
         balances[msg.sender] = _initialSupply;
         name = _name;
@@ -56,7 +64,7 @@ contract Token {
      * @param _to - The address receiving the tokens
      * @param _amount - The amount of tokens to be transferred
      */
-    function transfer (
+    function transfer(
                 address _to, 
                 uint256 _amount
             ) public {

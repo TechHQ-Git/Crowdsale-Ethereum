@@ -17,6 +17,8 @@ interface Token {
  */
 contract Crowdsale {
     // Crowdsale parameters
+    address owner;
+    bool initialized;
     address beneficiary;
     uint256 fundingGoal;
     uint256 fundsRaised;
@@ -43,7 +45,15 @@ contract Crowdsale {
         );
     
     /**
-     * @dev Constructor function, which sets up the crowdsale variables. The 
+     * @dev Constructor function, which sets up the crowdsale.
+     */
+    constructor() public {
+        assert(initialized != true);
+        owner = msg.sender;
+    }
+    
+    /**
+     * @dev Initialize function, which sets up the crowdsale variables. The 
      * user creating the crowdsale must provide the address to a token contract
      * with functions to keep track of how many tokens the crowdsale contract
      * and all the investors have.
@@ -56,26 +66,28 @@ contract Crowdsale {
      * @param _tokenPrice Ether amount required to buy each crowdsale token from
      * the crowdsale contract.
      */
-    constructor (
+    function initialize(
             address _beneficiary,
             uint256 _fundingGoal, 
             uint256 _deadline, 
             address _tokenReward, 
             uint256 _tokenPrice
         ) public {
+        require(owner == msg.sender);
+        require(initialized != true);
         beneficiary = _beneficiary;
         fundingGoal = _fundingGoal;
         deadline = _deadline;
         tokenReward = Token(_tokenReward); 
         tokenPrice = _tokenPrice;
+        initialized = true;
     }
-    
     
     /**
      * @dev Fallback function - The function without name is the default 
      * function that is executed when someone sends funds to a contract.
      */
-    function () payable external {
+    function() payable external {
         require(!crowdsaleClosed);
         balanceOf[msg.sender] += msg.value;
         fundsRaised += msg.value;
