@@ -265,15 +265,18 @@ contract B is owned {
 }
 </code>
 
-== Order of Functions ==
+== Order of Contract Elements ==
 
 Ordering helps readers identify which functions they can call and to find the 
 constructor and fallback definitions easier.
 
-Functions should be grouped according to their visibility and ordered:
+Functions should be grouped and ordered according to their implicit risk due to 
+visibility and costs:
 
+  - contract variables (storage)
   - constructor
   - fallback function (if exists)
+  - events
   - modifiers
   - external
   - public

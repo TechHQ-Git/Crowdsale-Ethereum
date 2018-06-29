@@ -3,7 +3,7 @@ pragma solidity ^0.4.0;
 
 contract Token {
     /* Public variables of the token.*/
-    address owner = msg.sender;
+    address public owner = msg.sender;
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -12,6 +12,14 @@ contract Token {
     /* This creates an array with all balances.*/
     mapping(address => uint256) balances;
     
+    /**
+     * @dev Builds contract and sets owner.
+     */
+    constructor() public {
+        assert(initialized != true);
+        owner = msg.sender;
+    }
+
     /**
      * @dev This generates a public event on the blockchain that will notify 
      * clients of a token transfer.
@@ -25,14 +33,6 @@ contract Token {
         uint256 indexed _amount
         );
     
-    /**
-     * @dev Builds contract and sets owner.
-     */
-    constructor() public {
-        assert(initialized != true);
-        owner = msg.sender;
-    }
-
     /**
      * @dev Initializes contract with initial supply tokens to the creator of 
      * the token.
