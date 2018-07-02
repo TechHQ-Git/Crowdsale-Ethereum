@@ -35,6 +35,8 @@ contract ThrowProxy {
 }
 
 contract TestToken {
+  // This just creates a handy variable to access the Token contract and its
+  // methods, the constructor is called in the migrations scripts, I think.
   Token token = Token(DeployedAddresses.Token());
 
   // Testing the constructor() function
@@ -57,6 +59,7 @@ contract TestToken {
       string memory expectedName = "TestToken";
       string memory expectedSymbol = "TTK";
 
+    // token.initialize(...) is the same as Token(address(token)).initialized
     token.initialize(
       expectedInitialSupply,
       expectedName,
@@ -109,7 +112,7 @@ contract TestToken {
     // The contract at the throwProxy address doesn't have an initialize function,
     // so its fallback function is called instead, which stores the call details
     // in an internal variable for later use. I think this is how you call other
-    // contracts normally. 
+    // contracts normally.
     Token(address(throwProxy)).initialize(
       expectedInitialSupply,
       expectedName,
