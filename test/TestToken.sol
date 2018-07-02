@@ -39,6 +39,11 @@ contract TestToken {
   // methods, the constructor is called in the migrations scripts, I think.
   Token token = Token(DeployedAddresses.Token());
 
+  uint tokenSupply = 100;
+  uint8 tokenDecimals = 16;
+  string tokenName = "TestToken";
+  string tokenSymbol = "TTK";
+
   // Testing the constructor() function
   function testConstructor() public {
     address expected = msg.sender;
@@ -53,40 +58,34 @@ contract TestToken {
 
   // Testing the initial supply through initialize() function
   function testInitialize() public {
-      uint expectedInitialSupply = 100;
-      uint8 expectedDecimals = 16;
-      // Strings are arrays and therefore storage by default, I think.
-      string memory expectedName = "TestToken";
-      string memory expectedSymbol = "TTK";
-
     // token.initialize(...) is the same as Token(address(token)).initialized
     token.initialize(
-      expectedInitialSupply,
-      expectedName,
-      expectedSymbol,
-      expectedDecimals
+      tokenSupply,
+      tokenName,
+      tokenSymbol,
+      tokenDecimals
       );
 
     Assert.equal(
-      expectedInitialSupply,
+      tokenSupply,
       uint256(token.getBalanceOf(this)), // Truffle needs to be told the type
       "The owner of the contract should have 100 TTK."
       );
 
     Assert.equal(
-      uint256(expectedDecimals), // TRUFFLE CAN'T TEST UINT8!!!
+      uint256(tokenDecimals), // TRUFFLE CAN'T TEST UINT8!!!
       uint256(token.decimals()),
       "The TestToken should have support for 16 decimals."
       );
 
     Assert.equal(
-      expectedName,
+      tokenName,
       string(token.name()),
       "The name of the token should be \"TestToken\"."
       );
 
     Assert.equal(
-      expectedSymbol,
+      tokenSymbol,
       string(token.symbol()),
       "The symbol of the token should be \"TTK\"."
       );
@@ -95,10 +94,10 @@ contract TestToken {
   // Use the ThrowProxy to test that token.initialize reverts if the token has
   // already been initialized.
   function testInitializeOnlyOnce() public {
-    uint expectedInitialSupply = 200;
-    uint8 expectedDecimals = 32;
-    string memory expectedName = "BrokenToken";
-    string memory expectedSymbol = "BTK";
+    uint bogusInitialSupply = 200;
+    uint8 bogusDecimals = 32;
+    string memory bogusName = "BrokenToken";
+    string memory bogusSymbol = "BTK";
 
     ThrowProxy throwProxy = new ThrowProxy();
     // Set token as the contract to forward requests to.
@@ -114,10 +113,10 @@ contract TestToken {
     // in an internal variable for later use. I think this is how you call other
     // contracts normally.
     Token(address(throwProxy)).initialize(
-      expectedInitialSupply,
-      expectedName,
-      expectedSymbol,
-      expectedDecimals
+      bogusInitialSupply,
+      bogusName,
+      bogusSymbol,
+      bogusDecimals
       );
     // I think the below is like calling throwProxy.execute(), but instructing
     // the EVM to give 800000 gas to the execution stack. Weird way to call
@@ -137,10 +136,51 @@ contract TestToken {
     address to = 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1;
     uint256 expectedBalance = 1;
     token.transfer(to,1);
+
     Assert.equal(
       expectedBalance,
       uint256(token.getBalanceOf(to)),
       "The balance of 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1 should be 1."
       );
   }
+
+  // Testing that we can't transfer more TTK that we own.
+  function testTransferLimit() public {
+    address to = 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1;
+    uint256 contractBalance = token.getBalanceOf(this);
+    //Setting up the proxy.
+    ThrowProxy throwProxy = new ThrowProxy();
+    throwProxy.setTarget(address(token));
+    // Prime the proxy.
+    Token(address(throwProxy)).transfer(to, tokenSupply+1);
+    bool result = throwProxy.execute.gas(200000)();
+
+    Assert.isFalse(
+      result,
+      "The contract should revert when transferring more tokens than the balance."
+      );
+    Assert.equal(
+      contractBalance,
+      token.getBalanceOf(this),
+      "The contract balance should remain unchanged when a transfer throws."
+      );
+  }
+
+  // Testing that SafeMath.sol does its job, and throws when we overflow uint256
+  // instead of looping back to zero.
+  /*function testOverflow() public {
+    // Setting up one address to overflow.
+    address to = 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0;
+    token.transfer(to,1);
+    //Setting up the proxy.
+    ThrowProxy throwProxy = new ThrowProxy();
+    throwProxy.setTarget(address(token));
+    // Prime the proxy.
+    // Funnily enough, 2**256-1 is the maximum number we can cast to uint256
+    // It throws because the previous test already transferred 1 TTK.
+    Token(address(throwProxy)).transfer(to, uint256(2**256-1));
+    bool result = throwProxy.execute.gas(200000)();
+
+    Assert.isFalse(result, "Should be false, as it should throw.");
+  }*/
 }
