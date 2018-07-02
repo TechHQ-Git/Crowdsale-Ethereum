@@ -5,7 +5,11 @@ import "truffle/DeployedAddresses.sol";
 import "../contracts/Token.sol";
 
 /**
- * @dev Proxy contract for testing throws
+ * @dev Proxy contract for testing throws.
+ * When passed a series of contracts the compiler assumes that the contract you
+ * wish to deploy to the blockchain is the final one – and that any other
+ * contracts it encounters are to be ignored until referenced in your main
+ * contract.
  * @author https://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
  */
 contract ThrowProxy {
@@ -15,7 +19,7 @@ contract ThrowProxy {
   constructor() public {}
 
   // Prime the data using the fallback function.
-  // Remember to set the target first with setTarget().
+  // Remember to set the target contract first with setTarget().
   function() public {
     data = msg.data;
   }
@@ -37,6 +41,7 @@ contract TestToken {
   function testConstructor() public {
     address expected = msg.sender;
     address returnedOwner = token.contractOwner();
+
     Assert.equal(
     	expected,
     	returnedOwner,
@@ -96,12 +101,24 @@ contract TestToken {
     // Set token as the contract to forward requests to.
     throwProxy.setTarget(address(token));
     // Prime the proxy.
+    // From https://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
+    // I think that you use Token(...).initialize(...) so that the compiler packs
+    // the initialize function from the Token contract with its arguments in
+    // msg.data, and then goes to the contract at the throwProxy address to
+    // execute it (expecting it to be the deployed Token contract).
+    // The contract at the throwProxy address doesn't have an initialize function,
+    // so its fallback function is called instead, which stores the call details
+    // in an internal variable for later use. I think this is how you call other
+    // contracts normally. 
     Token(address(throwProxy)).initialize(
       expectedInitialSupply,
       expectedName,
       expectedSymbol,
       expectedDecimals
       );
+    // I think the below is like calling throwProxy.execute(), but instructing
+    // the EVM to give 800000 gas to the execution stack. Weird way to call
+    // additional parameters allowed to all functions, IMHO.
     bool result = throwProxy.execute.gas(800000)();
 
     Assert.isFalse(result, "Should be false, as it should throw.");
