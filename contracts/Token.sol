@@ -14,7 +14,7 @@ contract Token {
     using SafeMath for uint256;
 
     /* Public variables of the token.*/
-    address public owner = msg.sender;
+    address public contractOwner;
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -28,7 +28,7 @@ contract Token {
      */
     constructor() public {
         assert(initialized != true);
-        owner = msg.sender;
+        contractOwner = msg.sender;
     }
 
     /**
@@ -58,9 +58,15 @@ contract Token {
                 string _symbol,
                 uint8 _decimals
             ) public {
-        // These two cause to revert, need fixing
-        //require(initialized != true);
-        //require(owner == msg.sender);
+        require(
+          initialized != true,
+          "The contract can only be initialized once."
+          );
+        // This require causes tests to revert, needs fixing
+        /*require(
+          msg.sender == contractOwner,
+          "Only the contract owner can initialize the contract."
+          );*/
         balances[msg.sender] = _initialSupply;
         name = _name;
         symbol = _symbol;
